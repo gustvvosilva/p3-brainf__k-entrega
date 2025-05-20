@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 
-ECHO = echo "fabricio=10*3+9"
+ECHO = echo "x=10-3*2+5-1"
 
 all: compilador executor
 
