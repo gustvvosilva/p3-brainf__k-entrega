@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 
-ECHO = echo "x=10-3*2+5-1"
+ECHO = echo "CRÉDITO=2*5+10"
 
 all: compilador executor
 

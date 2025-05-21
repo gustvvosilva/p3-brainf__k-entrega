@@ -1,5 +1,6 @@
-// compilador.c
-// gcc -o compilador compilador.c
+// compilador_utf8.c
+// Versão estendida para suportar nomes de variáveis UTF-8
+// gcc -o compilador compilador_utf8.c
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +17,7 @@ typedef struct {
     int val;      // caso is_mul==0
 } Term;
 
+// Remove todos espaços em branco em s
 void trim(char *s) {
     char *p = s, *w = s;
     while (*p) {
@@ -37,10 +39,13 @@ int main() {
     char *eq = strchr(line, '=');
     if (!eq) return 1;
     int varlen = eq - line;
-    char varname[varlen+1];
+    char varname[MAX_LINE];
+    // copia bytes (inclusive UTF-8) do nome
     strncpy(varname, line, varlen);
     varname[varlen] = '\0';
+    // remove espaços e recalcula comprimento em bytes
     trim(varname);
+    varlen = (int)strlen(varname);
 
     char expr[MAX_LINE];
     strcpy(expr, eq+1);
@@ -52,15 +57,8 @@ int main() {
     char *p = expr;
     int curr_sign = +1;
     while (*p && term_count < MAX_TERMS) {
-        if (*p == '+') {
-            curr_sign = +1; p++;
-            continue;
-        }
-        if (*p == '-') {
-            curr_sign = -1; p++;
-            continue;
-        }
-        // extrai até próximo + ou -
+        if (*p == '+') { curr_sign = +1; p++; continue; }
+        if (*p == '-') { curr_sign = -1; p++; continue; }
         char piece[MAX_LINE];
         char *q = p;
         while (*q && *q!='+' && *q!='-') q++;
@@ -69,7 +67,6 @@ int main() {
         piece[len] = '\0';
         trim(piece);
 
-        // detecta multiplicação A*B
         char *mul = strchr(piece, '*');
         if (mul) {
             *mul = '\0';
@@ -90,41 +87,37 @@ int main() {
         p = q;
     }
 
-    // prefixo: imprime "varname="
-    for(int i = 0; i < varlen; i++) {
+    // PREFIXO: imprime "varname=" suportando UTF-8
+    for (int i = 0; i < varlen; i++) {
+        unsigned char c = (unsigned char)varname[i];
         printf(">");
-        for(int j = 0; j < varname[i]; j++) printf("+");
+        for (int j = 0; j < c; j++) printf("+");
         printf(".");
     }
+    // imprime '=' (ASCII 61)
     printf(">");
-    for(int i = 0; i < 61; i++) printf("+");
+    for (int i = 0; i < 61; i++) printf("+");
     printf(".");
-    for(int i = 0; i < varlen + 1; i++) printf("<");
+    // volta ao cell 0 (varlen bytes + sinal de '=')
+    for (int i = 0; i < varlen + 1; i++) printf("<");
 
     // zera cell 0
     printf("[-]");
 
-    // gera BF para cada termo
+    // GERA BF PARA CADA TERMO
     for (int i = 0; i < term_count; i++) {
         Term *t = &terms[i];
         if (t->is_mul) {
             int A = t->a, B = t->b;
             // vai para cell1 e zera
-            printf(">");
-            printf("[-]");
+            printf(">"); printf("[-]");
             // coloca B em cell1
             for (int j = 0; j < B; j++) printf("+");
             // loop de B vezes: soma ou subtrai A em cell0
             if (t->sign > 0) {
-                // soma A:
-                printf("[<");
-                for (int j = 0; j < A; j++) printf("+");
-                printf(">-]");
+                printf("[<"); for (int j = 0; j < A; j++) printf("+"); printf(">-]");
             } else {
-                // subtrai A:
-                printf("[<");
-                for (int j = 0; j < A; j++) printf("-");
-                printf(">-]");
+                printf("[<"); for (int j = 0; j < A; j++) printf("-"); printf(">-]");
             }
             // volta para cell0
             printf("<");
