@@ -10,12 +10,12 @@
 int brainfuck(const char* cod) {
     unsigned char memoria[MEMORY_SIZE] = {0};
     int ptr = 0;
-    int code_pos = 0;
+    int cod_pos = 0;
     int loop_stack[MAX_NESTED_LOOPS];
     int loop_index = 0;
     
-    while (cod[code_pos] != '\0') {
-        switch (cod[code_pos]) {
+    while (cod[cod_pos] != '\0') {
+        switch (cod[cod_pos]) {
             case '>':
                 ptr++;
                 if (ptr >= MEMORY_SIZE) {
@@ -53,14 +53,14 @@ int brainfuck(const char* cod) {
                     // Pula para o correspondente ]
                     int depth = 1;
                     while (depth > 0) {
-                        code_pos++;
-                        if (cod[code_pos] == '[') {
+                        cod_pos++;
+                        if (cod[cod_pos] == '[') {
                             depth++;
-                        } else if (cod[code_pos] == ']') {
+                        } else if (cod[cod_pos] == ']') {
                             depth--;
                         }
                         
-                        if (cod[code_pos] == '\0') {
+                        if (cod[cod_pos] == '\0') {
                             printf("Erro: Loop não fechado\n");
                             return 1;
                         }
@@ -70,7 +70,7 @@ int brainfuck(const char* cod) {
                         printf("Erro: Loops aninhados demais\n");
                         return 1;
                     }
-                    loop_stack[loop_index] = code_pos;
+                    loop_stack[loop_index] = cod_pos;
                     loop_index++;
                 }
                 break;
@@ -82,14 +82,14 @@ int brainfuck(const char* cod) {
                 }
                 
                 if (memoria[ptr] != 0) {
-                    code_pos = loop_stack[loop_index - 1];
+                    cod_pos = loop_stack[loop_index - 1];
                 } else {
                     loop_index--;
                 }
                 break;
         }
         
-        code_pos++;
+        cod_pos++;
     }
 
     int result = memoria[0];
@@ -103,7 +103,6 @@ int main() {
     char c;
     int pos = 0;
     
-    // Lê o código Brainfuck da entrada padrão
     while ((c = getchar()) != EOF && pos < BUFFER_SIZE - 1) {
         // Apenas caracteres válidos de Brainfuck são armazenados
         if (c == '>' || c == '<' || c == '+' || c == '-' || 
@@ -114,7 +113,6 @@ int main() {
     }
     cod[pos] = '\0';
     
-    // Executa o código Brainfuck
     brainfuck(cod);
     
     return 0;

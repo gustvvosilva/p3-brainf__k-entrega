@@ -13,7 +13,7 @@ typedef struct {
     int val;      // caso is_mul==0
 } Term;
 
-// Remove todos espaços em branco em s
+// Remove todos espaços em branco.
 void trim(char *s) {
     char *p = s, *w = s;
     while (*p) {
@@ -27,19 +27,20 @@ int main() {
     char line[MAX_LINE];
     if (!fgets(line, sizeof(line), stdin))
         return 0;
-    // retira newline
+
     char *nl = strchr(line, '\n');
     if (nl) *nl = '\0';
 
-    // separa nome da variável e expressão
+    // separa nome da variável e expressão.
     char *eq = strchr(line, '=');
     if (!eq) return 1;
     int varlen = eq - line;
     char varname[MAX_LINE];
-    // copia bytes (inclusive UTF-8) do nome
+
     strncpy(varname, line, varlen);
     varname[varlen] = '\0';
-    // remove espaços e recalcula comprimento em bytes
+
+    // remove espaços e recalcula comprimento em bytes.
     trim(varname);
     varlen = (int)strlen(varname);
 
@@ -47,7 +48,6 @@ int main() {
     strcpy(expr, eq+1);
     trim(expr);
 
-    // parse de termos com sinais + e -
     Term terms[MAX_TERMS];
     int term_count = 0;
     char *p = expr;
@@ -83,21 +83,24 @@ int main() {
         p = q;
     }
 
-    // PREFIXO: imprime "varname=" suportando UTF-8
+    // Imprime "varname=" suportando UTF-8.
     for (int i = 0; i < varlen; i++) {
         unsigned char c = (unsigned char)varname[i];
         printf(">");
-        for (int j = 0; j < c; j++) printf("+");
+        for (int j = 0; j < c; j++)
+            printf("+");
         printf(".");
     }
-    // imprime '=' (ASCII 61)
-    printf(">");
-    for (int i = 0; i < 61; i++) printf("+");
-    printf(".");
-    // volta ao cell 0 (varlen bytes + sinal de '=')
-    for (int i = 0; i < varlen + 1; i++) printf("<");
 
-    // zera cell 0
+    // imprime '='.
+    printf(">");
+    for (int i = 0; i < 61; i++)
+        printf("+");
+    printf(".");
+
+    // Volta a celula 0.
+    for (int i = 0; i < varlen + 1; i++)
+        printf("<");
     printf("[-]");
 
     // GERA BF PARA CADA TERMO
@@ -105,28 +108,35 @@ int main() {
         Term *t = &terms[i];
         if (t->is_mul) {
             int A = t->a, B = t->b;
-            // vai para cell1 e zera
-            printf(">"); printf("[-]");
-            // coloca B em cell1
-            for (int j = 0; j < B; j++) printf("+");
-            // loop de B vezes: soma ou subtrai A em cell0
+
+            printf(">");
+            printf("[-]");
+
+            for (int j = 0; j < B; j++)
+                printf("+");
+
             if (t->sign > 0) {
-                printf("[<"); for (int j = 0; j < A; j++) printf("+"); printf(">-]");
+                printf("[<");
+                for (int j = 0; j < A; j++)
+                    printf("+");
+                printf(">-]");
             } else {
-                printf("[<"); for (int j = 0; j < A; j++) printf("-"); printf(">-]");
+                printf("[<");
+                for (int j = 0; j < A; j++)
+                    printf("-");
+                printf(">-]");
             }
-            // volta para cell0
             printf("<");
         } else {
             int V = abs(t->val);
             if (t->sign > 0) {
-                for (int j = 0; j < V; j++) printf("+");
+                for (int j = 0; j < V; j++)
+                    printf("+");
             } else {
-                for (int j = 0; j < V; j++) printf("-");
+                for (int j = 0; j < V; j++)
+                    printf("-");
             }
         }
     }
-
-    // não imprime '\n'
     return 0;
 }
