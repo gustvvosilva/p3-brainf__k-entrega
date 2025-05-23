@@ -1,21 +1,21 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 
-ECHO = echo "CRÉDITO=2*5+10"
+ECHO = echo "CRÉDITO♥=100+7*7-4*2"
 
-all: compilador executor
+all: bfc bfe
 
 compilador: compilador.c
-	$(CC) $(CFLAGS) -o compilador compilador.c
+	$(CC) $(CFLAGS) -o bfc bfc.c
 
 executor: executor.c
-	$(CC) $(CFLAGS) -o executor executor.c
+	$(CC) $(CFLAGS) -o bfe bfe.c
 
 bf: all
-	$(ECHO) | ./compilador
+	$(ECHO) | ./bfc
 
 run: all
-	$(ECHO) | ./compilador | ./executor
+	$(ECHO) | ./bfc | ./bfe
 
 clean:
-	rm -f compilador executor
+	rm -f bfc bfe

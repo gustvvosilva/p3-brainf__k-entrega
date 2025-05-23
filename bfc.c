@@ -1,7 +1,3 @@
-// compilador_utf8.c
-// Versão estendida para suportar nomes de variáveis UTF-8
-// gcc -o compilador compilador_utf8.c
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
